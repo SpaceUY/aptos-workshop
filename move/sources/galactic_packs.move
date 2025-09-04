@@ -354,8 +354,6 @@ module galactic_workshop::galactic_packs {
     // - creator: &signer - The account minting the NFTs
     // - user_addr: address - The address receiving the NFTs
     // 
-    // Returns: None
-    // 
     // This function:
     // - Mints one NFT from each collection (Alien, Predator, Yoda)
     // - Each NFT gets a random rarity level
@@ -408,8 +406,6 @@ module galactic_workshop::galactic_packs {
 
     // Generates a random rarity level for NFT packs using Aptos randomness
     // 
-    // Parameters: None
-    // 
     // Returns: string::String - The rarity level as a string
     // 
     // Rarity distribution:
@@ -420,11 +416,11 @@ module galactic_workshop::galactic_packs {
     // - Legendary: 8% chance
     // - Mythic: 5% chance
     // 
-    // Aborts if:
-    // - Aptos randomness service is unavailable
+    // https://aptos.dev/build/smart-contracts/randomness
     fun get_random_rarity(): string::String {
         // Balanced rarity system with good chances for rare items:
         // Common (30%), Uncommon (25%), Rare (20%), Epic (12%), Legendary (8%), Mythic (5%)
+        // WARNING: randomness API currently does not prevent undergasing attacks.
         let random_value = aptos_framework::randomness::u64_range(0, 100);
         
         if (random_value < 30) return string::utf8(b"Common");
@@ -434,8 +430,6 @@ module galactic_workshop::galactic_packs {
         if (random_value < 95) return string::utf8(b"Legendary");
         string::utf8(b"Mythic")
     }
-
-
 
     // ===== TEST FUNCTIONS =====
 
