@@ -11,19 +11,6 @@ module galactic_workshop::galactic_packs_test {
     use aptos_token_objects::property_map;
     use galactic_workshop::galactic_packs;
 
-    // Test addresses
-    const CREATOR_ADDR: address = @0x123;
-    const USER_ADDR: address = @0x456;
-
-    // Test signers
-    fun get_creator(): signer {
-        account::create_account_for_test(CREATOR_ADDR)
-    }
-
-    fun get_user(): signer {
-        account::create_account_for_test(USER_ADDR)
-    }
-
     // Setup function to initialize test environment
     #[test_only]
     #[lint::allow_unsafe_randomness]
@@ -71,8 +58,9 @@ module galactic_workshop::galactic_packs_test {
         // Buy a pack
         galactic_packs::buy_pack(user, creator);
         
-        // Verify that a pack was sold
-        let total_sold = galactic_packs::get_total_sold(CREATOR_ADDR);
+        // Verify that a pack was sold 
+        let creator_addr = signer::address_of(creator);
+        let total_sold = galactic_packs::get_total_sold(creator_addr);
         assert!(total_sold == 1, 17);
     }
 
@@ -88,13 +76,10 @@ module galactic_workshop::galactic_packs_test {
         // Buy a pack
         galactic_packs::buy_pack(user, creator);
         
-        // Verify that a pack was sold
-        let total_sold = galactic_packs::get_total_sold(CREATOR_ADDR);
-        assert!(total_sold == 1, 18);
-        
-        // Get the pack token ID from user account
-        // We need to find the first token in the "Galactic Pack" collection that belongs to the user
-        let creator_addr = signer::address_of(creator);        
+        // Verify that a pack was sold 
+        let creator_addr = signer::address_of(creator);
+        let total_sold = galactic_packs::get_total_sold(creator_addr);
+        assert!(total_sold == 1, 18);   
         
         // Get the first token owned by the user in the "Galactic Pack" collection
         // Since we know the user just bought one pack, it should be the first one

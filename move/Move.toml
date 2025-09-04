@@ -5,7 +5,7 @@ upgrade_policy = "compatible"
 
 [addresses]
 aptos_token_objects = "0x4"
-galactic_workshop = "5ff31326760d84e471ff8da1bcfb0eacd1d75b982267ff7040986909dc10f3d4"
+galactic_workshop = "56662426a5575f472599b56e7ac4add89867169e9669de4e37dd930e93599541"
 
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "mainnet" }
