@@ -18,7 +18,6 @@ module galactic_workshop::galactic_packs {
     const PACK_PRICE: u64 = 10000000; // 0.1 APT in octas
     const MAX_PACKS: u64 = 100;
     const PACK_SIZE: u64 = 3; // 3 NFTs per pack
-    const TOTAL_COLLECTIONS: u64 = 4;
 
     // Collection types
     const COLLECTION_GALACTIC_PACK: u64 = 0;
@@ -83,7 +82,8 @@ module galactic_workshop::galactic_packs {
 
     inline fun create_collections(creator: &signer) {
         let i = 0;
-        while (i < TOTAL_COLLECTIONS) {
+        let total_collections = vector::length(&COLLECTION_NAMES);
+        while (i < total_collections) {
             create_collection(creator, i);
             i = i + 1;
         };
