@@ -418,18 +418,35 @@ module galactic_workshop::galactic_packs {
     // 
     // https://aptos.dev/build/smart-contracts/randomness
     fun get_random_rarity(): string::String {
-        // Balanced rarity system with good chances for rare items:
-        // Common (30%), Uncommon (25%), Rare (20%), Epic (12%), Legendary (8%), Mythic (5%)
-        // WARNING: randomness API currently does not prevent undergasing attacks.
+        // Balanced rarity system with predefined probabilities:
+        // NOTE: the randomness API does not currently prevent undergassing attacks.
         let random_value = aptos_framework::randomness::u64_range(0, 100);
-        
-        if (random_value < 30) return string::utf8(b"Common");
-        if (random_value < 55) return string::utf8(b"Uncommon");
-        if (random_value < 75) return string::utf8(b"Rare");
-        if (random_value < 87) return string::utf8(b"Epic");
-        if (random_value < 95) return string::utf8(b"Legendary");
-        string::utf8(b"Mythic")
-    }
+
+        // Default rarity is "Mythic" (lowest probability case).
+        let mut rarity = string::utf8(b"Mythic");
+
+        // Assign rarity based on the generated random value.
+        // All conditions are checked to ensure constant gas usage.
+        if (random_value < 30) rarity = string::utf8(b"Common");                         // 0–29 → Common
+        if (random_value >= 30 && random_value < 55) rarity = string::utf8(b"Uncommon"); // 30–54 → Uncommon
+        if (random_value >= 55 && random_value < 75) rarity = string::utf8(b"Rare");     // 55–74 → Rare
+        if (random_value >= 75 && random_value < 87) rarity = string::utf8(b"Epic");     // 75–86 → Epic
+        if (random_value >= 87 && random_value < 95) rarity = string::utf8(b"Legendary");// 87–94 → Legendary
+                                                                                         // 95–99 → Mythic (default) 
+        rarity
+
+        //Incorrect:
+        // if (random_value < 30) return string::utf8(b"Common");
+        // if (random_value < 55) return string::utf8(b"Uncommon");
+        // if (random_value < 75) return string::utf8(b"Rare");
+        // if (random_value < 87) return string::utf8(b"Epic");
+        // if (random_value < 95) return string::utf8(b"Legendary");
+        // string::utf8(b"Mythic")
+        // Problem:
+        // - Each branch returns early, so the number of executed comparisons depends on `random_value`.
+        // - This makes the gas cost variable and can be exploited in undergassing attacks.
+        // - Always ensure every path executes the same amount of work before returning.
+    }  
 
     // ===== TEST FUNCTIONS =====
 
