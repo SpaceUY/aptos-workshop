@@ -1,11 +1,17 @@
-'use server'
+"use server";
 
-import { Aptos, AptosConfig, Network, Ed25519PrivateKey, Account } from '@aptos-labs/ts-sdk';
-import { CONTRACT_CONFIG } from '../config/contract';
-import { envConfig } from '../config/env';
+import {
+  Aptos,
+  AptosConfig,
+  Network,
+  Ed25519PrivateKey,
+  Account,
+} from "@aptos-labs/ts-sdk";
+import { CONTRACT_CONFIG } from "../config/contract";
+import { envConfig } from "../config/env";
 
 // Create Aptos client
-const aptosConfig = new AptosConfig({ 
+const aptosConfig = new AptosConfig({
   network: Network.TESTNET,
   clientConfig: {
     API_KEY: envConfig.aptos.serverApiKey,
@@ -15,7 +21,9 @@ const aptos = new Aptos(aptosConfig);
 
 // API key configuration
 if (!envConfig.aptos.serverApiKey) {
-  console.warn('⚠️ APTOS_API_KEY not set. Using anonymous endpoints (may hit rate limits)');
+  console.warn(
+    "⚠️ APTOS_API_KEY not set. Using anonymous endpoints (may hit rate limits)"
+  );
 }
 
 // Get creator account from environment
@@ -27,10 +35,12 @@ if (creatorPrivateKey) {
     const privateKey = new Ed25519PrivateKey(creatorPrivateKey);
     creatorAccount = Account.fromPrivateKey({ privateKey });
   } catch (error) {
-    console.error('❌ Error loading creator account:', error);
+    console.error("❌ Error loading creator account:", error);
   }
 } else {
-  console.warn('⚠️ CREATOR_PRIVATE_KEY not set. Multi-agent transactions will not work.');
+  console.warn(
+    "⚠️ CREATOR_PRIVATE_KEY not set. Multi-agent transactions will not work."
+  );
 }
 
 export interface TransactionPayload {
@@ -58,18 +68,18 @@ export interface Pack {
 export async function getTotalPacksSold(): Promise<number> {
   try {
     const creatorAddress = CONTRACT_CONFIG.MODULE_ADDRESS;
-    
+
     const result = await aptos.view({
       payload: {
         function: `${CONTRACT_CONFIG.MODULE_ADDRESS}::${CONTRACT_CONFIG.MODULE_NAME}::get_total_sold`,
         typeArguments: [],
         functionArguments: [creatorAddress],
-      }
+      },
     });
 
     return Number(result[0]);
   } catch (error) {
-    console.error('❌ Error getting total packs sold:', error);
+    console.error("❌ Error getting total packs sold:", error);
     return 0;
   }
 }
@@ -81,13 +91,15 @@ export async function getTotalPacksSold(): Promise<number> {
 export async function prepareBuyPackTransaction(
   userAddress: string
 ): Promise<TransactionPayload> {
-  try { 
+  try {
     if (!creatorAccount) {
-      throw new Error('Creator account not configured. Please set CREATOR_PRIVATE_KEY environment variable.');
-    } 
+      throw new Error(
+        "Creator account not configured. Please set CREATOR_PRIVATE_KEY environment variable."
+      );
+    }
     const txn = await aptos.transaction.build.multiAgent({
-      sender: userAddress,  
-      secondarySignerAddresses: [creatorAccount.accountAddress], 
+      sender: userAddress,
+      secondarySignerAddresses: [creatorAccount.accountAddress],
       data: {
         function: `${CONTRACT_CONFIG.MODULE_ADDRESS}::${CONTRACT_CONFIG.MODULE_NAME}::buy_pack`,
         typeArguments: [],
@@ -104,14 +116,14 @@ export async function prepareBuyPackTransaction(
     });
 
     const creatorAuthBytes = creatorAuth.bcsToBytes();
- 
+
     return {
       transactionBytes: Array.from(txnBytes),
       creatorAuthBytes: Array.from(creatorAuthBytes),
     };
   } catch (error) {
-    console.error('Error preparing multi-agent buy pack transaction:', error);
-    throw new Error('Failed to prepare multi-agent buy pack transaction');
+    console.error("Error preparing multi-agent buy pack transaction:", error);
+    throw new Error("Failed to prepare multi-agent buy pack transaction");
   }
 }
 
@@ -146,7 +158,10 @@ export async function getUserCollectionPacks(
     // Get detailed information for each token and convert to Pack format
     const userPacks = await Promise.all(
       allUserTokens.map(async (token) => {
-        const tokenData = token as { token_data_id: string; current_token_data?: { token_name?: string; token_uri?: string } };
+        const tokenData = token as {
+          token_data_id: string;
+          current_token_data?: { token_name?: string; token_uri?: string };
+        };
         try {
           // Get complete digital asset data
           const digitalAssetData = await aptos.getDigitalAssetData({
@@ -154,22 +169,25 @@ export async function getUserCollectionPacks(
           });
 
           // Determine if this is a pack collection (has Pack Number and Opened properties)
-          const isPackCollection = digitalAssetData.token_properties && 
-            (digitalAssetData.token_properties["Pack Number"] || digitalAssetData.token_properties.Opened);
-          
+          const isPackCollection =
+            digitalAssetData.token_properties &&
+            (digitalAssetData.token_properties["Pack Number"] ||
+              digitalAssetData.token_properties.Opened);
+
           let isOpened = false;
           let rarity = "Unknown";
           let packNumber = "Unknown";
           let serialNumber = "Unknown";
-          
+
           if (isPackCollection) {
             // PACK COLLECTION: Extract Pack Number and Opened status
             if (digitalAssetData.token_properties.Opened) {
-              isOpened = digitalAssetData.token_properties.Opened === "true" || 
-                        digitalAssetData.token_properties.Opened === true ||
-                        digitalAssetData.token_properties.Opened === "1";
+              isOpened =
+                digitalAssetData.token_properties.Opened === "true" ||
+                digitalAssetData.token_properties.Opened === true ||
+                digitalAssetData.token_properties.Opened === "1";
             }
-            
+
             if (digitalAssetData.token_properties["Pack Number"]) {
               packNumber = digitalAssetData.token_properties["Pack Number"];
             }
@@ -178,7 +196,7 @@ export async function getUserCollectionPacks(
             if (digitalAssetData.token_properties["Serial Number"]) {
               serialNumber = digitalAssetData.token_properties["Serial Number"];
             }
-            
+
             if (digitalAssetData.token_properties.Rarity) {
               rarity = digitalAssetData.token_properties.Rarity;
             }
@@ -189,7 +207,8 @@ export async function getUserCollectionPacks(
 
           return {
             tokenId: tokenData.token_data_id,
-            tokenName: tokenData.current_token_data?.token_name || "Unknown Pack",
+            tokenName:
+              tokenData.current_token_data?.token_name || "Unknown Pack",
             tokenUri: tokenData.current_token_data?.token_uri || undefined,
             digitalAssetData: {
               ...digitalAssetData,
@@ -198,7 +217,8 @@ export async function getUserCollectionPacks(
               tokenProperties: digitalAssetData.token_properties,
               supply: digitalAssetData.supply,
               maximum: digitalAssetData.maximum,
-              largestPropertyVersionV1: digitalAssetData.largest_property_version_v1,
+              largestPropertyVersionV1:
+                digitalAssetData.largest_property_version_v1,
               tokenUri: digitalAssetData.token_uri,
               description: digitalAssetData.description,
               tokenName: digitalAssetData.token_name,
@@ -217,11 +237,12 @@ export async function getUserCollectionPacks(
           );
           return {
             tokenId: tokenData.token_data_id,
-            tokenName: tokenData.current_token_data?.token_name || "Unknown Pack",
+            tokenName:
+              tokenData.current_token_data?.token_name || "Unknown Pack",
             tokenUri: tokenData.current_token_data?.token_uri || undefined,
             digitalAssetData: null,
             error: error instanceof Error ? error.message : "Unknown error",
-            isOpened: false, // Default to unopened if there's an error
+            isOpened: false, // Default to unopened
             rarity: "Unknown",
             packNumber: undefined,
             serialNumber: undefined,
@@ -244,10 +265,10 @@ export async function getUserCollectionPacks(
  */
 export async function getUserGalleryAssets(
   userAddress: string
-): Promise<{ aliens: Pack[], predators: Pack[], yodas: Pack[] }> {
+): Promise<{ aliens: Pack[]; predators: Pack[]; yodas: Pack[] }> {
   try {
-    const { envConfig } = await import('../config/env');
-    
+    const { envConfig } = await import("../config/env");
+
     const [aliens, predators, yodas] = await Promise.all([
       getUserCollectionPacks(userAddress, envConfig.collections.aliens),
       getUserCollectionPacks(userAddress, envConfig.collections.predators),
@@ -269,14 +290,16 @@ export async function prepareOpenPackTransaction(
   userAddress: string,
   packTokenId: string
 ): Promise<TransactionPayload> {
-  try { 
+  try {
     if (!creatorAccount) {
-      throw new Error('Creator account not configured. Please set CREATOR_PRIVATE_KEY environment variable.');
+      throw new Error(
+        "Creator account not configured. Please set CREATOR_PRIVATE_KEY environment variable."
+      );
     }
- 
+
     const txn = await aptos.transaction.build.multiAgent({
-      sender: userAddress,  
-      secondarySignerAddresses: [creatorAccount.accountAddress], 
+      sender: userAddress,
+      secondarySignerAddresses: [creatorAccount.accountAddress],
       data: {
         function: `${CONTRACT_CONFIG.MODULE_ADDRESS}::${CONTRACT_CONFIG.MODULE_NAME}::open_pack`,
         typeArguments: [],
@@ -293,15 +316,13 @@ export async function prepareOpenPackTransaction(
     });
 
     const creatorAuthBytes = creatorAuth.bcsToBytes();
- 
+
     return {
       transactionBytes: Array.from(txnBytes),
       creatorAuthBytes: Array.from(creatorAuthBytes),
     };
   } catch (error) {
-    console.error('Error preparing multi-agent open pack transaction:', error);
-    throw new Error('Failed to prepare multi-agent open pack transaction');
+    console.error("Error preparing multi-agent open pack transaction:", error);
+    throw new Error("Failed to prepare multi-agent open pack transaction");
   }
 }
-
-
