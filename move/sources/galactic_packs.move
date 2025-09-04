@@ -423,8 +423,8 @@ module galactic_workshop::galactic_packs {
         let random_value = aptos_framework::randomness::u64_range(0, 100);
 
         // Default rarity is "Mythic" (lowest probability case).
-        let mut rarity = string::utf8(b"Mythic");
-
+        let rarity = string::utf8(b"Mythic");
+        
         // Assign rarity based on the generated random value.
         // All conditions are checked to ensure constant gas usage.
         if (random_value < 30) rarity = string::utf8(b"Common");                         // 0–29 → Common
