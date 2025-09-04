@@ -94,16 +94,18 @@ module galactic_workshop::galactic_packs {
         
         let description = string::utf8(b"Collection of Galactic Characters");
         
+        let max_supply = MAX_PACKS;
+
         // https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/aptos_token.move
         // Create collection using aptos_token_objects
         aptos_token::create_collection(
             creator,
             description,
-            1000000, 
+            max_supply,
             collection_name,
             image_uri,
             true, true, true, true, true, true, true, false, false,
-            5, 100 
+            5, 100 // 5% royalty
         );
     }
  
@@ -424,7 +426,7 @@ module galactic_workshop::galactic_packs {
 
         // Default rarity is "Mythic" (lowest probability case).
         let rarity = string::utf8(b"Mythic");
-        
+
         // Assign rarity based on the generated random value.
         // All conditions are checked to ensure constant gas usage.
         if (random_value < 30) rarity = string::utf8(b"Common");                         // 0–29 → Common
