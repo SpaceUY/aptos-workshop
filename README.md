@@ -68,26 +68,18 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 
 ### Step 2: Deploy Move Module
 
-1. **Test, compile and deploy the module**:
+1. **Compile, test and deploy the module**:
+
+   ```bash
+   aptos move compile
+   ```
 
    ```bash
    aptos move test
    ```
 
    ```bash
-   aptos move compile --named-addresses galactic_workshop=<your_account_address>
-   ```
-
-   <!-- https://aptos.dev/build/smart-contracts/deployment -->
-
-   Deploy the compiled code to an object via the command:
-
-   ```bash
-   aptos move compile --named-addresses galactic_workshop=<your_account_address>
-   ```
-
-   ```bash
-   aptos move deploy-object --address-name galactic_workshop
+   aptos move deploy
    ```
 
 ### Step 3: Run Web Application
