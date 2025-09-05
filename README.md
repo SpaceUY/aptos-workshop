@@ -20,7 +20,7 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 
 ```
 ├── galactic-warriors-web/    //web to interact
-├── move/                     //aptos modules                    
+├── move/                     //aptos modules
 └── README.md
 ```
 
@@ -35,12 +35,14 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 ### Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd galactic-sticker-packs
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -55,6 +57,7 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 ### Step 1: Set Up Wallet
 
 1. **Install Petra Wallet**:
+
    - Go to [petra.app](https://petra.app)
    - Install the browser extension
    - Create a new account
@@ -65,30 +68,40 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 
 ### Step 2: Deploy Move Module
 
-1. **Compile, test and deploy the module**:
-   ```bash
-   aptos move compile
-   ```
+1. **Test, compile and deploy the module**:
 
    ```bash
    aptos move test
    ```
 
    ```bash
-   aptos move deploy
+   aptos move compile --named-addresses galactic_workshop=<your_account_address>
+   ```
+
+   <!-- https://aptos.dev/build/smart-contracts/deployment -->
+
+   Deploy the compiled code to an object via the command:
+
+   ```bash
+   aptos move compile --named-addresses galactic_workshop=<your_account_address>
+   ```
+
+   ```bash
+   aptos move deploy-object --address-name galactic_workshop
    ```
 
 ### Step 3: Run Web Application
 
 1. **Set envireoment vars**:
+
    - Go to [geomi.dev/](https://geomi.dev/)
    - Create new project
    - Create New API Resource (testnet)
    - Set it as APTOS_API_KEY in .env.local
    - CREATOR_PRIVATE_KEY should be defined in move/.aptos/config.yaml as private_key (after aptos init)
 
-
 2. **Start development server**:
+
    ```bash
    npm run dev
    ```
@@ -117,7 +130,6 @@ Welcome to the **Galactic Sticker Packs** workshop! This is a complete project t
 - **Wallet Integration**: Connection with Petra Wallet
 - **Mulit-agent Trensaction**: Signatures from server and client
 
-
 ## 🎯 Learning Objectives
 
 After completing this workshop, you will learn:
@@ -132,7 +144,6 @@ After completing this workshop, you will learn:
 - [Aptos Documentation](https://aptos.dev)
 - [Move Guide](https://move-language.github.io/move/)
 - [Aptos Token Standard](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token/doc/overview.md)
-
 
 ---
 
