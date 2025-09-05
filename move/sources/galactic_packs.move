@@ -254,7 +254,6 @@ module galactic_workshop::galactic_packs {
         assert!(pack_store.total_sold < MAX_PACKS, E_NO_PACKS_AVAILABLE); 
 
         // Transfer payment from user to creator
-        // https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/doc/property_map.md#0x4_property_map
         let user_coin = coin::withdraw<aptos_framework::aptos_coin::AptosCoin>(user, PACK_PRICE);
         coin::deposit(creator_addr, user_coin);
 
@@ -333,6 +332,7 @@ module galactic_workshop::galactic_packs {
         assert!(object::is_owner(pack_object, user_addr), E_NOT_AUTHORIZED); 
 
         // Check if the pack is already opened
+        // https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/doc/property_map.md#0x4_property_map
         let opened_property = property_map::read_bool(&pack_object, &string::utf8(b"Opened"));
         assert!(!opened_property, E_PACK_ALREADY_OPENED);
         
