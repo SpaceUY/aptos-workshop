@@ -63,13 +63,13 @@ module galactic_workshop::galactic_packs {
     // Parameters:
     // - creator: &signer - The account that deploys this module
     fun init_module(creator: &signer) acquires PackStore {
- // Create collections for each type using a loop
+        // Create collections for each type using a loop
         create_collections(creator);
         // Mint galactic pack
         mint_pack(creator);
     }
 
-   // ===== FUNCTIONS =====
+    // ===== FUNCTIONS =====
     // Creates all NFT collections by iterating through the collection types
     // 
     // Parameters:
